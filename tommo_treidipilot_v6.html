@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tommo TreidiPilot v6</title>
+<style>
+:root{--bg:#07111f;--card:#0f1f33;--card2:#132842;--text:#eef6ff;--muted:#a8bad0;--green:#21c784;--red:#ff5c72;--yellow:#ffd166;--blue:#5dade2;--line:#243b57}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#07111f,#0b1728);color:var(--text)}
+.wrap{max-width:1150px;margin:auto;padding:16px 12px 92px}h1{font-size:23px;margin:0}.sub,.muted{color:var(--muted)}.sub{font-size:13px;margin-top:4px}
+header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 10px;color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.card{grid-column:span 12;background:linear-gradient(180deg,var(--card),#0b1a2b);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+@media(min-width:850px){.span4{grid-column:span 4}.span6{grid-column:span 6}.span8{grid-column:span 8}}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:650px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--card2);border:1px solid var(--line);padding:12px;border-radius:14px}.label{font-size:12px;color:var(--muted)}.value{font-size:21px;font-weight:850;margin-top:4px}
+.progress{height:14px;background:#06101d;border-radius:999px;overflow:hidden;border:1px solid var(--line)}.bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));width:0}
+.signals{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:700px){.signals{grid-template-columns:repeat(3,1fr)}}
+.signal{padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--card2)}.signal.buy{border-color:rgba(33,199,132,.5)}.signal.sell{border-color:rgba(255,92,114,.5)}.signal.wait{border-color:rgba(255,209,102,.5)}
+.big{font-size:29px;font-weight:900}.notice{padding:10px;border-radius:12px;background:#092037;border:1px solid var(--line);color:var(--muted)}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}input,select,button{width:100%;font:inherit;border-radius:12px;border:1px solid var(--line);background:#09182a;color:var(--text);padding:11px}
+button{cursor:pointer;background:#173456;font-weight:750}button.primary{background:linear-gradient(135deg,#1976d2,#21c784);border:0}button.warn{background:#57451c}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:9px 6px;text-align:left;vertical-align:top}th{color:var(--muted)}
+.tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--line)}.tag.buy{color:var(--green);border-color:rgba(33,199,132,.5)}.tag.sell{color:var(--red);border-color:rgba(255,92,114,.5)}.tag.wait{color:var(--yellow);border-color:rgba(255,209,102,.5)}
+.ok{color:var(--green)}.bad{color:var(--red)}.small{font-size:12px}.hidden{display:none!important}
+.footer{position:fixed;bottom:0;left:0;right:0;background:#07111fee;border-top:1px solid var(--line);backdrop-filter:blur(8px);padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.footer button{font-size:12px;padding:10px 3px}
+.status{font-size:12px;color:var(--muted);white-space:pre-wrap;margin-top:8px}.symbolbox{border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:10px;background:#09182a}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div><h1>Tommo TreidiPilot v6</h1><div class="sub">Google Apps Script -kurssihaku + manuaalinen varatila + OP-stop-ohje</div></div><div class="pill" id="clock">—</div></header>
+
+<section id="view-dashboard" class="view">
+<div class="grid">
+<div class="card">
+<div class="kpis">
+<div class="kpi"><div class="label">Nykyinen kassa</div><div class="value" id="equityNow">300,00 €</div></div>
+<div class="kpi"><div class="label">Tavoite</div><div class="value">400,00 €</div></div>
+<div class="kpi"><div class="label">Matkaa</div><div class="value" id="toGoal">100,00 €</div></div>
+<div class="kpi"><div class="label">Datalähde</div><div class="value">GAS</div></div>
+</div>
+<div class="progress" style="margin-top:12px"><div class="bar" id="goalBar"></div></div>
+<div class="small muted" id="autoStatus" style="margin-top:8px">—</div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">Päivän päätös</h2>
+<div class="signals">
+<div class="signal buy"><h2>OSTA</h2><div class="big" id="buyCount">0</div><div class="muted">selkeää signaalia</div></div>
+<div class="signal sell"><h2>MYY / STOP</h2><div class="big" id="sellCount">0</div><div class="muted">position hälytystä</div></div>
+<div class="signal wait"><h2>ODOTA</h2><div class="big" id="waitCount">0</div><div class="muted">ei treidiä</div></div>
+</div>
+</div>
+
+<div class="card span8">
+<h2 style="margin-top:0">Watchlist & signaalit</h2>
+<div class="notice">v6 hakee kurssit Google Apps Script -välipalvelun kautta. Tämä kiertää paikallisen HTML:n CORS-ongelman.</div>
+<button class="primary" onclick="refreshAll()" style="margin-top:10px">Päivitä kaikki automaattisesti</button>
+<div style="overflow:auto;margin-top:10px"><table id="watchTable"><thead><tr><th>Osake</th><th>Hinta</th><th>Eilinen</th><th>Muutos</th><th>Signaali</th><th>Toimi</th></tr></thead><tbody></tbody></table></div>
+</div>
+
+<div class="card span4">
+<h2 style="margin-top:0">Manuaalinen varapäivitys</h2>
+<label>Osake</label><select id="priceSymbol"></select>
+<div class="row"><div><label>Viimeisin hinta €</label><input id="lastPrice" type="number" step="0.001"></div><div><label>Eilinen päätös €</label><input id="prevClose" type="number" step="0.001"></div></div>
+<button onclick="updatePrice()">Päivitä käsin</button><button onclick="requestNotify()" style="margin-top:8px">Salli ilmoitukset</button>
+</div>
+
+<div class="card span6"><h2 style="margin-top:0">Avoimet positiot</h2><div style="overflow:auto"><table id="posTable"><thead><tr><th>Osake</th><th>Osto</th><th>Nyt</th><th>Tulos</th><th>Toimi</th></tr></thead><tbody></tbody></table></div></div>
+<div class="card span6"><h2 style="margin-top:0">OP-toimeksiantoapuri</h2><div id="opHelp" class="notice">Kun kirjaat oston, saat tähän stop-loss- ja tavoitemyyntiohjeen.</div></div>
+</div>
+</section>
+
+<section id="view-auto" class="view hidden">
+<div class="grid">
+<div class="card span6">
+<h2 style="margin-top:0">Automaattinen kurssihaku</h2>
+<label>Google Apps Script Web App URL</label>
+<input id="scriptUrl" placeholder="Liitä tähän /exec-päätteinen URL">
+<div class="row"><div><label>Autopäivitys minuutteina</label><input id="autoMinutes" type="number" min="1" value="5"></div><div><label>Autopäivitys</label><select id="autoOn"><option value="false">Pois</option><option value="true">Päällä</option></select></div></div>
+<button class="primary" onclick="saveAutoSettings()">Tallenna automaatio</button>
+<button onclick="testOne()" style="margin-top:8px">Testaa Nokia-haku</button>
+<button onclick="refreshAll()" style="margin-top:8px">Hae kaikki nyt</button>
+<button class="warn" onclick="resetFinnishSymbols()" style="margin-top:8px">Palauta Yahoo-symbolit</button>
+<div class="status" id="apiStatus">Ei testattu.</div>
+</div>
+
+<div class="card span6">
+<h2 style="margin-top:0">Symbolit</h2>
+<div class="notice">Apps Script käyttää Yahoo Finance -symboleita. Helsingin Nokia on yleensä <b>NOKIA.HE</b>.</div>
+<div id="symbolEditor"></div><button onclick="saveSymbols()">Tallenna symbolit</button>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">Miksi v6?</h2>
+<p>Paikallinen HTML ei saa hakea Yahoo/Stooq-dataa suoraan, koska selain estää pyynnön. Google Apps Script hakee datan palvelimen puolelta ja palauttaa sen sovellukselle.</p>
+</div>
+</div>
+</section>
+
+<section id="view-trade" class="view hidden">
+<div class="grid">
+<div class="card span6"><h2 style="margin-top:0">Lisää osto</h2><label>Osake</label><select id="buySymbol"></select><div class="row"><div><label>Ostohinta €</label><input id="buyPrice" type="number" step="0.001"></div><div><label>Summa €</label><input id="buyAmount" type="number" step="1" value="60"></div></div><button class="primary" onclick="addPosition()">Kirjaa OSTO</button></div>
+<div class="card span6"><h2 style="margin-top:0">Strategian asetukset</h2><div class="row"><div><label>Alkupääoma €</label><input id="startCapital" type="number" value="300"></div><div><label>Tavoite €</label><input id="goalCapital" type="number" value="400"></div></div><div class="row3"><div><label>Kulu / kauppa %</label><input id="feePct" type="number" step="0.01" value="0.10"></div><div><label>Myyntitavoite %</label><input id="targetPct" type="number" step="0.1" value="2.0"></div><div><label>Stop-loss %</label><input id="stopPct" type="number" step="0.1" value="1.5"></div></div><div class="row"><div><label>Max positio % kassasta</label><input id="maxPosPct" type="number" value="40"></div><div><label>Ostoalue alkaa %</label><input id="dipPct" type="number" step="0.1" value="-2.5"></div></div><button onclick="saveSettings()">Tallenna asetukset</button></div>
+</div>
+</section>
+
+<section id="view-log" class="view hidden"><div class="card"><h2 style="margin-top:0">Treidipäiväkirja</h2><button onclick="exportCSV()">Vie CSV</button><button class="warn" onclick="clearLog()" style="margin-top:8px">Tyhjennä päiväkirja</button><div style="overflow:auto;margin-top:10px"><table id="logTable"><thead><tr><th>Aika</th><th>Osake</th><th>Tyyppi</th><th>Hinta</th><th>Summa</th><th>Tulos</th></tr></thead><tbody></tbody></table></div></div></section>
+
+<section id="view-guide" class="view hidden"><div class="card"><h2 style="margin-top:0">Käyttöönotto</h2>
+<p><b>1.</b> Avaa mukana tullut <b>apps_script_proxy_code.txt</b>.</p>
+<p><b>2.</b> Mene Google Apps Scriptiin, luo uusi projekti ja liitä koodi.</p>
+<p><b>3.</b> Julkaise Web Appina: Execute as “Me”, Who has access “Anyone”.</p>
+<p><b>4.</b> Kopioi /exec-päätteinen URL.</p>
+<p><b>5.</b> Liitä URL Auto-välilehdelle ja paina “Testaa Nokia-haku”.</p>
+<div class="notice"><b>Muista:</b> Tämä ei tee toimeksiantoja OP:ssa. Kun ostat, aseta stop-loss OP:ssa itse.</div></div></section>
+</div>
+
+<nav class="footer"><button onclick="showView('dashboard')">Etusivu</button><button onclick="showView('auto')">Auto</button><button onclick="showView('trade')">Osto</button><button onclick="showView('log')">Päiväkirja</button><button onclick="showView('guide')">Ohje</button></nav>
+
+<script>
+const LS='tommo_treidipilot_v6';let timer=null;
+let state={settings:{start:300,goal:400,feePct:.10,targetPct:2,stopPct:1.5,maxPosPct:40,dipPct:-2.5},auto:{scriptUrl:'',autoMinutes:5,autoOn:false,lastUpdate:null},watch:[
+{s:'Nokia',price:null,prev:null,risk:'keskitaso',symbol:'NOKIA.HE'},
+{s:'Metso',price:null,prev:null,risk:'keskitaso',symbol:'METSO.HE'},
+{s:'Valmet',price:null,prev:null,risk:'keskitaso',symbol:'VALMT.HE'},
+{s:'Mandatum',price:null,prev:null,risk:'keskitaso',symbol:'MANTA.HE'},
+{s:'Puuilo',price:null,prev:null,risk:'keskitaso',symbol:'PUUILO.HE'},
+{s:'Harvia',price:null,prev:null,risk:'korkea',symbol:'HARVIA.HE'},
+{s:'Remedy',price:null,prev:null,risk:'erittäin korkea',symbol:'REMEDY.HE'}],positions:[],log:[]};
+function load(){try{const x=JSON.parse(localStorage.getItem(LS));if(x)state={...state,...x}}catch(e){}}
+function save(){localStorage.setItem(LS,JSON.stringify(state))}
+function eur(n){return(Number(n)||0).toLocaleString('fi-FI',{style:'currency',currency:'EUR'})}
+function pct(n){return(Number(n)||0).toLocaleString('fi-FI',{maximumFractionDigits:2})+'%'}
+function now(){return new Date().toLocaleString('fi-FI')}
+function calcPnl(p){const fee=state.settings.feePct/100,cur=p.current||p.buy,qty=p.amount/p.buy,buyFee=p.amount*fee,sellVal=qty*cur,sellFee=sellVal*fee;return{qty,pnl:sellVal-p.amount-buyFee-sellFee,pnlPct:((cur/p.buy)-1)*100-state.settings.feePct*2}}
+function equity(){return state.settings.start+state.log.reduce((a,l)=>a+(l.pnl||0),0)+state.positions.reduce((a,p)=>a+calcPnl(p).pnl,0)}
+function signal(w){if(!w.price||!w.prev)return{t:'ODOTA',cls:'wait',msg:'Ei dataa'};const ch=(w.price/w.prev-1)*100;if(ch<=state.settings.dipPct&&ch>=-6)return{t:'OSTA',cls:'buy',msg:'Dippi '+pct(ch)};if(ch<-6)return{t:'ODOTA',cls:'wait',msg:'Liian raju lasku '+pct(ch)};if(ch>2.5)return{t:'ODOTA',cls:'wait',msg:'Älä jahtaa nousua '+pct(ch)};return{t:'ODOTA',cls:'wait',msg:'Ei edgeä '+pct(ch)}}
+function render(){clock.textContent=now();autoStatus.textContent='Viimeisin päivitys: '+(state.auto.lastUpdate||'ei vielä');
+['priceSymbol','buySymbol'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const val=el.value;el.innerHTML='';state.watch.forEach((w,i)=>{let o=document.createElement('option');o.value=i;o.textContent=w.s;el.appendChild(o)});if(val)el.value=val});
+const eq=equity();equityNow.textContent=eur(eq);toGoal.textContent=eur(Math.max(0,state.settings.goal-eq));goalBar.style.width=Math.max(0,Math.min(100,((eq-state.settings.start)/(state.settings.goal-state.settings.start))*100))+'%';
+let buy=0,sell=0,wait=0;const wt=document.querySelector('#watchTable tbody');wt.innerHTML='';state.watch.forEach((w,i)=>{const sig=signal(w);if(sig.cls==='buy')buy++;else wait++;const ch=w.price&&w.prev?(w.price/w.prev-1)*100:0;wt.insertAdjacentHTML('beforeend',`<tr><td><b>${w.s}</b><br><span class="small muted">${w.symbol}</span></td><td>${w.price?eur(w.price):'—'}</td><td>${w.prev?eur(w.prev):'—'}</td><td>${w.price&&w.prev?pct(ch):'—'}</td><td><span class="tag ${sig.cls}">${sig.t}</span><br><span class="small">${sig.msg}</span></td><td><button onclick="prefillBuy(${i})">Ostin</button></td></tr>`)});
+const pt=document.querySelector('#posTable tbody');pt.innerHTML='';state.positions.forEach((p,i)=>{const cp=calcPnl(p),target=p.buy*(1+state.settings.targetPct/100),stop=p.buy*(1-state.settings.stopPct/100);let st='Pidä',cls='wait';if((p.current||p.buy)>=target){st='MYY';cls='sell';sell++}if((p.current||p.buy)<=stop){st='STOP';cls='sell';sell++}pt.insertAdjacentHTML('beforeend',`<tr><td><b>${p.s}</b><br><span class="tag ${cls}">${st}</span></td><td>${eur(p.buy)}<br><span class="small">Stop ${eur(stop)} / tavoite ${eur(target)}</span></td><td><input type="number" step="0.001" value="${p.current||p.buy}" onchange="updPos(${i},this.value)"></td><td class="${cp.pnl>=0?'ok':'bad'}">${eur(cp.pnl)}<br><span class="small">${pct(cp.pnlPct)}</span></td><td><button onclick="sellPos(${i})">Myin</button><button onclick="showOP(${i})">OP-ohje</button></td></tr>`)});
+buyCount.textContent=buy;sellCount.textContent=sell;waitCount.textContent=state.watch.length-buy;
+const lt=document.querySelector('#logTable tbody');if(lt){lt.innerHTML='';state.log.slice().reverse().forEach(l=>lt.insertAdjacentHTML('beforeend',`<tr><td>${l.time}</td><td>${l.s}</td><td>${l.type}</td><td>${eur(l.price)}</td><td>${eur(l.amount)}</td><td class="${(l.pnl||0)>=0?'ok':'bad'}">${l.pnl!==undefined?eur(l.pnl):'—'}</td></tr>`))}
+if(document.getElementById('scriptUrl')){scriptUrl.value=state.auto.scriptUrl||'';autoMinutes.value=state.auto.autoMinutes;autoOn.value=String(state.auto.autoOn)}
+[['startCapital','start'],['goalCapital','goal'],['feePct','feePct'],['targetPct','targetPct'],['stopPct','stopPct'],['maxPosPct','maxPosPct'],['dipPct','dipPct']].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=state.settings[k]});renderSymbols();scheduleAuto()}
+function renderSymbols(){const box=document.getElementById('symbolEditor');if(!box)return;box.innerHTML='';state.watch.forEach((w,i)=>box.insertAdjacentHTML('beforeend',`<div class="symbolbox"><b>${w.s}</b><label>Yahoo-symboli</label><input data-i="${i}" value="${w.symbol||''}"></div>`))}
+function saveSymbols(){document.querySelectorAll('#symbolEditor input').forEach(inp=>state.watch[+inp.dataset.i].symbol=inp.value.trim());save();render()}
+function resetFinnishSymbols(){const d=[['Nokia','NOKIA.HE'],['Metso','METSO.HE'],['Valmet','VALMT.HE'],['Mandatum','MANTA.HE'],['Puuilo','PUUILO.HE'],['Harvia','HARVIA.HE'],['Remedy','REMEDY.HE']];d.forEach(x=>{const w=state.watch.find(y=>y.s===x[0]);if(w)w.symbol=x[1]});save();render();apiStatus.textContent='Symbolit palautettu.'}
+function updatePrice(){const i=+priceSymbol.value;state.watch[i].price=+lastPrice.value;state.watch[i].prev=+prevClose.value;notifyIfBuy(i);save();render()}
+function prefillBuy(i){showView('trade');buySymbol.value=i;buyPrice.value=state.watch[i].price||''}
+function addPosition(){const i=+buySymbol.value,w=state.watch[i],price=+buyPrice.value,amount=+buyAmount.value;if(!price||!amount)return alert('Lisää ostohinta ja summa.');const max=equity()*state.settings.maxPosPct/100;if(amount>max&&!confirm('Positio ylittää max-riskisäännön '+eur(max)+'. Jatketaanko?'))return;state.positions.push({s:w.s,buy:price,amount,current:price,time:now()});state.log.push({time:now(),s:w.s,type:'OSTO',price,amount});save();render();showOP(state.positions.length-1)}
+function updPos(i,val){state.positions[i].current=+val;const p=state.positions[i],cp=calcPnl(p),target=p.buy*(1+state.settings.targetPct/100),stop=p.buy*(1-state.settings.stopPct/100);if(+val>=target)notify('MYYNTISIGNAALI: '+p.s,'Tavoite täynnä. Nettotulos noin '+eur(cp.pnl));if(+val<=stop)notify('STOP-LOSS: '+p.s,'Stop-raja täynnä. Toimi OP:ssa.');save();render()}
+function sellPos(i){const p=state.positions[i],cp=calcPnl(p);state.log.push({time:now(),s:p.s,type:'MYYNTI',price:p.current||p.buy,amount:p.amount,pnl:cp.pnl});state.positions.splice(i,1);save();render()}
+function showOP(i){const p=state.positions[i],qty=p.amount/p.buy,stop=p.buy*(1-state.settings.stopPct/100),target=p.buy*(1+state.settings.targetPct/100);opHelp.innerHTML=`<b>${p.s}: OP-ohje</b><br><br>1) Ostettu noin <b>${qty.toFixed(2)} kpl</b> hintaan <b>${eur(p.buy)}</b>.<br>2) Aseta OP:ssa stop-loss: <b>${eur(stop)}</b><br>3) Tavoitemyynti: <b>${eur(target)}</b><br><br><span class="small muted">Tarkista OP:n pyöristys, minimierät ja toimeksiannon voimassaoloaika.</span>`;showView('dashboard')}
+function saveSettings(){state.settings={start:+startCapital.value,goal:+goalCapital.value,feePct:+feePct.value,targetPct:+targetPct.value,stopPct:+stopPct.value,maxPosPct:+maxPosPct.value,dipPct:+dipPct.value};save();render()}
+function saveAutoSettings(){state.auto.scriptUrl=scriptUrl.value.trim();state.auto.autoMinutes=+autoMinutes.value||5;state.auto.autoOn=autoOn.value==='true';save();render();apiStatus.textContent='Tallennettu.'}
+function requestNotify(){Notification.requestPermission().then(()=>alert('Ilmoitukset: '+Notification.permission))}
+function notify(title,body){if('Notification'in window&&Notification.permission==='granted')new Notification(title,{body})}
+function notifyIfBuy(i){const sig=signal(state.watch[i]);if(sig.cls==='buy')notify('OSTOSIGNAALI: '+state.watch[i].s,sig.msg)}
+function showView(v){document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));document.getElementById('view-'+v).classList.remove('hidden')}
+function exportCSV(){const rows=[['Aika','Osake','Tyyppi','Hinta','Summa','Tulos']].concat(state.log.map(l=>[l.time,l.s,l.type,l.price,l.amount,l.pnl??'']));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(';')).join('\n')],{type:'text/csv'}));a.download='tommo_treidipaivakirja.csv';a.click()}
+function clearLog(){if(confirm('Tyhjennetäänkö päiväkirja?')){state.log=[];save();render()}}
+
+async function fetchQuote(w){
+ if(!state.auto.scriptUrl)throw new Error('Lisää Google Apps Script Web App URL Auto-välilehdelle.');
+ const url=state.auto.scriptUrl+'?symbol='+encodeURIComponent(w.symbol);
+ const r=await fetch(url);
+ if(!r.ok)throw new Error('Apps Script HTTP '+r.status);
+ const d=await r.json();
+ if(!d.ok)throw new Error(d.error||'Apps Script ei palauttanut dataa');
+ return{price:+d.price,prev:+d.prev};
+}
+async function testOne(){try{apiStatus.textContent='Testataan...';const q=await fetchQuote(state.watch[0]);apiStatus.textContent='Testi OK: Nokia hinta '+eur(q.price)+', eilinen '+eur(q.prev)}catch(e){apiStatus.textContent='Testi epäonnistui: '+e.message}}
+async function refreshAll(){let ok=0,fails=[];const st=document.getElementById('apiStatus');if(st)st.textContent='Haetaan kursseja...';for(let i=0;i<state.watch.length;i++){try{const q=await fetchQuote(state.watch[i]);state.watch[i].price=q.price;state.watch[i].prev=q.prev;ok++;notifyIfBuy(i);await new Promise(res=>setTimeout(res,150))}catch(e){fails.push(state.watch[i].s+': '+e.message)}}state.positions.forEach(p=>{const w=state.watch.find(x=>x.s===p.s);if(w&&w.price)p.current=w.price});state.auto.lastUpdate=now();save();render();const msg='Päivitetty '+ok+'/'+state.watch.length+' osaketta.'+(fails.length?'\nVirheet:\n'+fails.join('\n'):'');const st2=document.getElementById('apiStatus');if(st2)st2.textContent=msg}
+function scheduleAuto(){if(timer){clearInterval(timer);timer=null}if(state.auto.autoOn&&state.auto.scriptUrl)timer=setInterval(refreshAll,Math.max(1,state.auto.autoMinutes)*60000)}
+load();render();setInterval(()=>clock.textContent=now(),30000)
+</script>
+</body>
+</html>
