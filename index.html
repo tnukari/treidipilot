@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tommo TreidiPilot v8.1.1 Smart Filter</title>
+<title>Tommo TreidiPilot v8.2.1 Smart Filter</title>
 <meta name="theme-color" content="#07111f">
 <style>
 :root{--bg:#07111f;--card:#0f1f33;--card2:#132842;--text:#eef6ff;--muted:#a8bad0;--green:#21c784;--red:#ff5c72;--yellow:#ffd166;--blue:#5dade2;--line:#243b57}
@@ -31,7 +31,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
 </head>
 <body>
 <div class="wrap">
-<header><div><h1>Tommo TreidiPilot v8.1</h1><div class="sub">Smart Filter | Fundamentti + trendi | GitHub Pages</div></div><div class="pill" id="clock">—</div></header>
+<header><div><h1>Tommo TreidiPilot v8.2</h1><div class="sub">Smart Filter | Fundamentti + trendi | GitHub Pages</div></div><div class="pill" id="clock">—</div></header>
 
 <section id="view-home" class="view">
 <div class="grid">
@@ -48,13 +48,13 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
 </div>
 </section>
 
-<section id="view-auto" class="view hidden"><div class="grid"><div class="card span6"><h2 style="margin-top:0">Automaattinen kurssihaku</h2><label>Google Apps Script Web App URL</label><input id="scriptUrl" placeholder="Liitä /exec-päätteinen URL"><div class="row"><div><label>Autopäivitys minuutteina</label><input id="autoMinutes" type="number" min="1" value="5"></div><div><label>Autopäivitys</label><select id="autoOn"><option value="false">Pois</option><option value="true">Päällä</option></select></div></div><button class="primary" onclick="saveAutoSettings()">Tallenna automaatio</button><button onclick="testOne()" style="margin-top:8px">Testaa Nokia-haku</button><button onclick="refreshAll()" style="margin-top:8px">Hae kaikki nyt</button><button class="warn" onclick="resetSymbols()" style="margin-top:8px">Palauta v8-osakelista</button><div class="status" id="apiStatus">Ei testattu.</div></div><div class="card span6"><h2 style="margin-top:0">Symbolit ja ryhmät</h2><div class="notice">Päälista: Nokia, Nordea, Metso, Valmet, Wärtsilä, Neste, Mandatum, Puuilo. Riskilista: Harvia, Qt Group, Remedy. Huom: puhelin ja tietokone tallentavat asetukset erikseen.</div><div id="symbolEditor"></div><button onclick="saveSymbols()">Tallenna symbolit</button></div></div></section>
+<section id="view-auto" class="view hidden"><div class="grid"><div class="card span6"><h2 style="margin-top:0">Automaattinen kurssihaku</h2><label>Google Apps Script Web App URL</label><input id="scriptUrl" placeholder="Liitä /exec-päätteinen URL"><div class="row"><div><label>Autopäivitys minuutteina</label><input id="autoMinutes" type="number" min="1" value="5"></div><div><label>Autopäivitys</label><select id="autoOn"><option value="false">Pois</option><option value="true">Päällä</option></select></div></div><button class="primary" onclick="saveAutoSettings()">Tallenna automaatio</button><button onclick="testOne()" style="margin-top:8px">Testaa Nokia-haku</button><button onclick="refreshAll()" style="margin-top:8px">Hae kaikki nyt</button><button class="warn" onclick="resetSymbols()" style="margin-top:8px">Palauta v8-osakelista</button><div class="status" id="apiStatus">Ei testattu.</div></div><div class="card span6"><h2 style="margin-top:0">Symbolit ja ryhmät</h2><div class="notice">Päälista: Nokia, Nordea, Metso, Valmet, Wärtsilä, Neste, Mandatum, Puuilo. Riskilista: Harvia, Qt Group, Remedy. Huom: puhelin ja tietokone tallentavat asetukset erikseen. v8.2 näyttää trendin myös varamallilla, vaikka toissapäivän päätöskurssi ei tulisi läpi.</div><div id="symbolEditor"></div><button onclick="saveSymbols()">Tallenna symbolit</button></div></div></section>
 
 <section id="view-trade" class="view hidden"><div class="grid"><div class="card span6"><h2 style="margin-top:0">Lisää osto</h2><label>Osake</label><select id="buySymbol"></select><div class="row"><div><label>Ostohinta €</label><input id="buyPrice" type="number" step="0.001"></div><div><label>Summa €</label><input id="buyAmount" type="number" step="1" value="60"></div></div><button class="primary" onclick="addPosition()">Kirjaa OSTO</button></div><div class="card span6"><h2 style="margin-top:0">Strategian asetukset</h2><div class="row"><div><label>Alkupääoma €</label><input id="startCapital" type="number" value="300"></div><div><label>Tavoite €</label><input id="goalCapital" type="number" value="400"></div></div><div class="row3"><div><label>Kulu / kauppa %</label><input id="feePct" type="number" step="0.01" value="0.10"></div><div><label>Myyntitavoite %</label><input id="targetPct" type="number" step="0.1" value="2.0"></div><div><label>Stop-loss %</label><input id="stopPct" type="number" step="0.1" value="1.5"></div></div><div class="row"><div><label>Max positio % kassasta</label><input id="maxPosPct" type="number" value="40"></div><div><label>Ostoalue alkaa %</label><input id="dipPct" type="number" step="0.1" value="-2.5"></div></div><button onclick="saveSettings()">Tallenna asetukset</button></div><div class="card"><h2 style="margin-top:0">Riskisäännöt</h2><div class="notice">Päälista: max 40 % kassasta / treidi. Riskilista: suositus max 20 % kassasta / treidi. Stop-loss asetetaan aina OP:ssa heti oston jälkeen.</div></div></div></section>
 
 <section id="view-log" class="view hidden"><div class="card"><h2 style="margin-top:0">Treidipäiväkirja</h2><button onclick="exportCSV()">Vie CSV</button><button class="warn" onclick="clearLog()" style="margin-top:8px">Tyhjennä päiväkirja</button><div style="overflow:auto;margin-top:10px"><table id="logTable"><thead><tr><th>Aika</th><th>Osake</th><th>Tyyppi</th><th>Hinta</th><th>Summa</th><th>Tulos</th></tr></thead><tbody></tbody></table></div></div></section>
 
-<section id="view-guide" class="view hidden"><div class="card"><h2 style="margin-top:0">Käyttöohje</h2><p><b>1.</b> Mene Auto-välilehdelle ja varmista, että Apps Script URL on tallessa.</p><p><b>2.</b> Paina etusivulla <b>Päivitä kurssit</b>.</p><p><b>3.</b> Katso ylin päätös: VAHVA OSTA / OSTA / MYY / ODOTA.</p><p><b>Fundamentti:</b> HYVÄ sallii ostot, OK antaa varovaisen signaalin, HEIKKO estää ostot.</p><p><b>4.</b> Jos ostat OP:ssa, paina sovelluksessa <b>Ostin</b>.</p><p><b>5.</b> Aseta OP:ssa stop-loss heti sovelluksen antamaan hintaan.</p><div class="notice"><b>Huom:</b> v8.1 käyttää teknistä signaalia, manuaalista fundamenttisuodatinta ja trendivaroitusta. Jos puhelin ja tietokone näyttävät eri signaalit, paina molemmissa Palauta v8-osakelista, liitä sama Apps Script URL ja Päivitä kurssit. Laitteilla on omat paikalliset asetukset.</div></div></section>
+<section id="view-guide" class="view hidden"><div class="card"><h2 style="margin-top:0">Käyttöohje</h2><p><b>1.</b> Mene Auto-välilehdelle ja varmista, että Apps Script URL on tallessa.</p><p><b>2.</b> Paina etusivulla <b>Päivitä kurssit</b>.</p><p><b>3.</b> Katso ylin päätös: VAHVA OSTA / OSTA / MYY / ODOTA.</p><p><b>Fundamentti:</b> HYVÄ sallii ostot, OK antaa varovaisen signaalin, HEIKKO estää ostot.</p><p><b>4.</b> Jos ostat OP:ssa, paina sovelluksessa <b>Ostin</b>.</p><p><b>5.</b> Aseta OP:ssa stop-loss heti sovelluksen antamaan hintaan.</p><div class="notice"><b>Huom:</b> v8.2 käyttää teknistä signaalia, manuaalista fundamenttisuodatinta ja trendivaroitusta. Jos puhelin ja tietokone näyttävät eri signaalit, paina molemmissa Palauta v8-osakelista, liitä sama Apps Script URL ja Päivitä kurssit. Laitteilla on omat paikalliset asetukset.</div></div></section>
 </div>
 <nav class="footer"><button onclick="showView('home')">Etusivu</button><button onclick="showView('auto')">Auto</button><button onclick="showView('trade')">Osto</button><button onclick="showView('log')">Päiväkirja</button><button onclick="showView('guide')">Ohje</button></nav>
 
@@ -82,10 +82,20 @@ function now(){return new Date().toLocaleString('fi-FI')}
 function calcPnl(p){const fee=state.settings.feePct/100,cur=p.current||p.buy,qty=p.amount/p.buy,buyFee=p.amount*fee,sellVal=qty*cur,sellFee=sellVal*fee;return{qty,pnl:sellVal-p.amount-buyFee-sellFee,pnlPct:((cur/p.buy)-1)*100-state.settings.feePct*2}}
 function equity(){return state.settings.start+state.log.reduce((a,l)=>a+(l.pnl||0),0)+state.positions.reduce((a,p)=>a+calcPnl(p).pnl,0)}
 function trend(w){
- if(!w.prev || !w.prev2) return 'unknown';
- if(w.prev>w.prev2) return 'up';
- if(w.prev<w.prev2) return 'down';
- return 'flat';
+ // Ensisijainen trendi: eilinen päätös vs toissapäivän päätös.
+ if(w.prev && w.prev2){
+  if(w.prev>w.prev2) return 'up';
+  if(w.prev<w.prev2) return 'down';
+  return 'flat';
+ }
+ // Varatrendi: jos Apps Script ei palauta prev2-arvoa, käytä päivän hintaa vs eilinen päätös.
+ // Tämä ei ole yhtä hyvä kuin 2 päivän trendi, mutta estää kysymysmerkit ja antaa käyttökelpoisen suunnan.
+ if(w.price && w.prev){
+  if(w.price>w.prev) return 'up';
+  if(w.price<w.prev) return 'down';
+  return 'flat';
+ }
+ return 'unknown';
 }
 function fundLabel(f){return f==='good'?'HYVÄ':f==='ok'?'OK':'HEIKKO'}
 function fundClass(f){return f==='good'?'good':f==='ok'?'ok':'weak'}
@@ -134,7 +144,7 @@ const b=best();const main=document.getElementById('mainDecision');main.className
 if(sell>0){main.textContent='MYY / STOP';main.className='heroDecision sell';mainReason.textContent='Avoimessa positiossa on tavoite- tai stop-hälytys. Tarkista OP.'}
 else if(b&&b.sig.cls==='buy'){main.textContent=b.sig.t==='VAHVA OSTA'?'VAHVA OSTA':'OSTA';main.className='heroDecision buy';mainReason.textContent='Paras signaali: '+b.w.s+' — '+b.sig.msg+'. Tarkista hinta OP:ssa ennen toimeksiantoa.'}
 else{main.textContent='ODOTA';main.className='heroDecision wait';mainReason.textContent='Ei riittävän hyvää setupia. Paras treidi voi olla olla tekemättä mitään.'}
-bestSignal.innerHTML=b&&b.w.price?`<b>${b.w.s}</b><br>${b.sig.msg}<br><span class="tag ${fundClass(b.w.fund)}">${fundLabel(b.w.fund)}</span> <span class="small muted">${trend(b.w)==='up'?'Trendi ylös':trend(b.w)==='down'?'Trendi alas':'Trendi epäselvä'}</span><br><span class="small muted">Symboli ${b.w.symbol} | ${b.w.note}</span>`:'Ei vielä dataa. Paina “Päivitä kurssit”.';
+bestSignal.innerHTML=b&&b.w.price?`<b>${b.w.s}</b><br>${b.sig.msg}<br><span class="tag ${fundClass(b.w.fund)}">${fundLabel(b.w.fund)}</span> <span class="small muted">${trend(b.w)==='up'?'Trendi ylös':trend(b.w)==='down'?'Trendi alas':'Trendi epäselvä'}</span><br><span class="small muted">Symboli ${b.w.symbol} | ${b.w.note} | prev2: ${b.w.prev2?eur(b.w.prev2):'ei saatavilla'}</span>`:'Ei vielä dataa. Paina “Päivitä kurssit”.';
 const lt=document.querySelector('#logTable tbody');if(lt){lt.innerHTML='';state.log.slice().reverse().forEach(l=>lt.insertAdjacentHTML('beforeend',`<tr><td>${l.time}</td><td>${l.s}</td><td>${l.type}</td><td>${eur(l.price)}</td><td>${eur(l.amount)}</td><td class="${(l.pnl||0)>=0?'ok':'bad'}">${l.pnl!==undefined?eur(l.pnl):'—'}</td></tr>`))}
 if(document.getElementById('scriptUrl')){scriptUrl.value=state.auto.scriptUrl||'';autoMinutes.value=state.auto.autoMinutes;autoOn.value=String(state.auto.autoOn)}
 [['startCapital','start'],['goalCapital','goal'],['feePct','feePct'],['targetPct','targetPct'],['stopPct','stopPct'],['maxPosPct','maxPosPct'],['dipPct','dipPct']].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=state.settings[k]});renderSymbols();scheduleAuto()}
@@ -171,7 +181,7 @@ function exportCSV(){const rows=[['Aika','Osake','Tyyppi','Hinta','Summa','Tulos
 function clearLog(){if(confirm('Tyhjennetäänkö päiväkirja?')){state.log=[];save();render()}}
 async function fetchQuote(w){if(!state.auto.scriptUrl)throw new Error('Lisää Google Apps Script Web App URL Auto-välilehdelle.');const url=state.auto.scriptUrl+'?symbol='+encodeURIComponent(w.symbol);const r=await fetch(url);if(!r.ok)throw new Error('Apps Script HTTP '+r.status);const d=await r.json();if(!d.ok)throw new Error(d.error||'Apps Script ei palauttanut dataa');return{price:+d.price,prev:+d.prev,prev2:+(d.prev2||0)}}
 async function testOne(){try{apiStatus.textContent='Testataan...';const q=await fetchQuote(state.watch[0]);apiStatus.textContent='Testi OK: Nokia hinta '+eur(q.price)+', eilinen '+eur(q.prev)}catch(e){apiStatus.textContent='Testi epäonnistui: '+e.message}}
-async function refreshAll(){let ok=0,fails=[];const st=document.getElementById('apiStatus');if(st)st.textContent='Haetaan kursseja...';for(let i=0;i<state.watch.length;i++){try{const q=await fetchQuote(state.watch[i]);state.watch[i].price=q.price;state.watch[i].prev=q.prev;if(q.prev2)state.watch[i].prev2=q.prev2;ok++;notifyIfBuy(i);await new Promise(res=>setTimeout(res,120))}catch(e){fails.push(state.watch[i].s+': '+e.message)}}state.positions.forEach(p=>{const w=state.watch.find(x=>x.s===p.s);if(w&&w.price)p.current=w.price});state.auto.lastUpdate=now();save();render();const msg='Päivitetty '+ok+'/'+state.watch.length+' osaketta.'+(fails.length?'\nVirheet:\n'+fails.join('\n'):'');const st2=document.getElementById('apiStatus');if(st2)st2.textContent=msg}
+async function refreshAll(){let ok=0,fails=[];const st=document.getElementById('apiStatus');if(st)st.textContent='Haetaan kursseja...';for(let i=0;i<state.watch.length;i++){try{const q=await fetchQuote(state.watch[i]);state.watch[i].price=q.price;state.watch[i].prev=q.prev;if(Number.isFinite(q.prev2))state.watch[i].prev2=q.prev2;ok++;notifyIfBuy(i);await new Promise(res=>setTimeout(res,120))}catch(e){fails.push(state.watch[i].s+': '+e.message)}}state.positions.forEach(p=>{const w=state.watch.find(x=>x.s===p.s);if(w&&w.price)p.current=w.price});state.auto.lastUpdate=now();save();render();const msg='Päivitetty '+ok+'/'+state.watch.length+' osaketta.'+(fails.length?'\nVirheet:\n'+fails.join('\n'):'');const st2=document.getElementById('apiStatus');if(st2)st2.textContent=msg}
 function scheduleAuto(){if(timer){clearInterval(timer);timer=null}if(state.auto.autoOn&&state.auto.scriptUrl)timer=setInterval(refreshAll,Math.max(1,state.auto.autoMinutes)*60000)}
 load();render();setInterval(()=>clock.textContent=now(),30000)
 </script>
